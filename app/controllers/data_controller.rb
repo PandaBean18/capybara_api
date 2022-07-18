@@ -1,33 +1,24 @@
 class DataController < ApplicationController 
     def upload
-        last_id = Datum.last ? ( Datum.last.id + 1) : 1
-        image_path = "#{Dir.pwd}/app/assets/images/#{last_id}.png"
-        f = open(image_path, 'wb')
         data = Base64.decode64(params[:image_data])
+        f = open("#{Dir.pwd}/app/assets/images/tmp.png", 'wb')
         f.write(data)
         f.close
-        sleep(1)
-        image_url = "http://127.0.0.1:3000#{ActionController::Base.helpers.image_path("#{last_id}.png")}"
-        @datum = Datum.new(
-            student_name: params[:student_name], 
-            student_class: params[:student_class], 
-            student_section: params[:student_section], 
-            student_quote: params[:student_quote], 
-            image_url: image_url
-        )
-
-        if @datum.save
-            render json: @datum
+        system('python3 upload.py')
+        sleep(0.1)
+        f = open("#{Dir.pwd}/image_url.txt", 'r')
+        url = f.read 
+        f.close 
+        @datum = Datum.new(student_name: params[:student_name], student_class: params[:student_class], student_section: params[:student_section], student_quote: params[:student_quote], image_url: url)
+        if @datum.save 
+            render json: @datum 
         else  
-            render json: @datum.errors.full_messages, status: :bad_request
+            render json: @datum.errors.full_messages
         end
     end
 
-    def image 
-        id = params[:id]
-        url = ActionController::Base.helpers.image_path("#{id}.png")
-        if url 
-            redirect_to(url)
-        end
+    def images
+        @data = Datum.all 
+        render json: @data 
     end
 end
