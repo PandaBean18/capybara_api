@@ -1,6 +1,8 @@
 class DataController < ApplicationController 
     def upload
         data = Base64.decode64(params[:image_data])
+        student_class = params[:student_class].split(' ')[0]
+        student_section = params[:student_class].split(' ')[1]
         f = open("#{Dir.pwd}/app/assets/images/tmp.png", 'wb')
         f.write(data)
         f.close
@@ -9,7 +11,7 @@ class DataController < ApplicationController
         f = open("#{Dir.pwd}/image_url.txt", 'r')
         url = f.read 
         f.close 
-        @datum = Datum.new(student_name: params[:student_name], student_class: params[:student_class], student_section: params[:student_section], student_quote: params[:student_quote], image_url: url)
+        @datum = Datum.new(student_name: params[:student_name], student_class: student_class, student_section: student_section, student_quote: params[:student_quote], image_url: url)
         if @datum.save 
             render json: @datum 
         else  
