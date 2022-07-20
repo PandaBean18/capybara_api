@@ -1,7 +1,7 @@
 class DataController < ApplicationController 
     def upload
         data = Base64.decode64(params[:image_data])
-        student_class = params[:student_class].split(' ')[0]
+        student_class = params[:student_class].split(' ')[0].to_i
         student_section = params[:student_class].split(' ')[1]
         f = open("#{Dir.pwd}/app/assets/images/tmp.png", 'wb')
         f.write(data)
