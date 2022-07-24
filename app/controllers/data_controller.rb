@@ -20,7 +20,7 @@ class DataController < ApplicationController
     end
 
     def images
-        @data = Datum.all 
+        @data = Datum.order(created_at: :desc).limit(10)
         render json: @data 
     end
 end
